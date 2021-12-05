@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.thespacemanatee.cleanarchitecturenoteapp.feature_note.presentation.notes.components.NoteItem
 import com.thespacemanatee.cleanarchitecturenoteapp.feature_note.presentation.notes.components.OrderSection
+import com.thespacemanatee.cleanarchitecturenoteapp.feature_note.presentation.util.Screen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -33,7 +34,9 @@ fun NotesScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { },
+                onClick = {
+                    navController.navigate(Screen.AddEditNoteScreen.route)
+                },
                 backgroundColor = MaterialTheme.colors.primary
             ) {
                 Icon(
@@ -84,16 +87,19 @@ fun NotesScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(state.notes) {
+                items(state.notes) { note ->
                     NoteItem(
-                        note = it,
+                        note = note,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-
+                                navController.navigate(
+                                    Screen.AddEditNoteScreen.route +
+                                            "?noteId=${note.id}&noteColor=${note.color}"
+                                )
                             },
                         onDeleteClick = {
-                            viewModel.onEvent(NotesEvent.DeleteNote(it))
+                            viewModel.onEvent(NotesEvent.DeleteNote(note))
                             scope.launch {
                                 val result = scaffoldState.snackbarHostState.showSnackbar(
                                     message = "Note deleted",
